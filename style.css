@@ -32,7 +32,7 @@
     position: fixed;
     top: 70px;
     right: 20px;
-    width: 400px; /* 统一宽度 */
+    width: 400px;
     height: 85vh;
     background-color: var(--panel-bg);
     border: 1px solid var(--input-border);
@@ -43,21 +43,36 @@
     color: var(--text-color);
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* 隐藏滚动条，由内部处理 */
-}
-
-#panel-content {
-    flex-grow: 1;
-    overflow-y: auto; /* 主要内容区域滚动 */
-    padding: 20px;
-    padding-bottom: 70px; /* 为固定按钮栏留出空间 */
+    overflow: hidden; /* Let children handle scrolling */
 }
 
 .friend-circle-panel.hidden {
     display: none;
 }
 
-/* 通用按钮样式 */
+/* Main scrollable content area */
+#panel-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Sticky button container at the bottom */
+#fixed-btn-container {
+    flex-shrink: 0; /* Prevent shrinking */
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 20px;
+    background-color: rgba(42, 42, 46, 0.8);
+    border-top: 1px solid var(--divider-color);
+    backdrop-filter: blur(5px);
+    position: sticky;
+    bottom: 0;
+}
+
+/* ===========================
+   通用控件样式
+   =========================== */
 .friend-circle-panel button {
     cursor: pointer;
     padding: 10px 15px;
@@ -67,6 +82,8 @@
     color: var(--text-color);
     transition: background-color 0.2s;
     font-weight: bold;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .friend-circle-panel button:hover {
@@ -79,7 +96,6 @@
     color: #888;
 }
 
-/* 输入框和选择框样式 */
 .friend-circle-panel input[type="text"],
 .friend-circle-panel select,
 .friend-circle-panel textarea {
@@ -103,20 +119,41 @@
 /* ===========================
    模块样式
    =========================== */
-#api-module, #user-prompt-module, #regex-module, #identityModule {
+#api-module, #user-prompt-module, #regex-module, #identity-module {
     border-top: 1px solid var(--divider-color);
     padding-top: 15px;
     margin-top: 15px;
 }
 
-/* 提示词/正则列表 */
-#prompt-list-container div, #regex-list div {
+/* 提示词列表 (可折叠) */
+.prompt-item .prompt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 8px;
+    border-bottom: 1px solid var(--divider-color);
+}
+.prompt-item .prompt-content {
+    padding: 10px;
+    background-color: #222;
+    border-bottom: 1px solid var(--divider-color);
+    white-space: pre-wrap;
+    word-break: break-all;
+    font-size: 0.9em;
+    color: #ddd;
+}
+.prompt-content.hidden {
+    display: none;
+}
+
+/* 正则列表 */
+#regex-list div {
     padding: 8px;
     border-bottom: 1px solid var(--divider-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    word-break: break-all;
 }
 
 .delete-btn {
@@ -127,10 +164,8 @@
     padding: 2px 6px;
     font-size: 12px;
     cursor: pointer;
-}
-
-#prompt-list-container input[type="radio"] {
-    margin-right: 10px;
+    flex-shrink: 0;
+    margin-left: 10px;
 }
 
 /* 状态提示文字 */
@@ -146,7 +181,9 @@
     border-radius: 8px;
     padding: 15px;
     margin-top: 15px;
-    min-height: 100px; /* 保证有最小高度 */
+    min-height: 150px;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 /* 大面板模式 */
@@ -157,20 +194,7 @@
     width: 80vw;
     height: 80vh;
     resize: both;
-    overflow: auto; /* 允许整个大面板调整大小时出现滚动条 */
-}
-
-/* 固定按钮容器 */
-#fixed-btn-container {
-    position: sticky;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-around;
-    padding: 10px;
-    background-color: var(--panel-bg);
-    border-top: 1px solid var(--divider-color);
+    overflow: auto; /* Allow resizing to create scrollbars */
 }
 
 /* 调试日志区域 */
@@ -185,10 +209,11 @@
     white-space: pre-wrap;
     margin-top: 15px;
     font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8em;
 }
 
 #slider-container {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
+    margin: 15px 0;
 }
