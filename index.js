@@ -471,8 +471,9 @@ regexModule.style.marginTop = '10px';
 regexModule.innerHTML = `
     <h4>正则替换规则</h4>
     <div id="regex-list"></div>
-    <input type="text" id="regex-pattern-input" placeholder="正则表达式">
-    <input type="text" id="regex-replacement-input" placeholder="替换为">
+    <input type="text" id="regex-name-input" placeholder="规则名称">
+    <input type="text" id="regex-pattern-input" placeholder="查找正则表达式">
+    <textarea id="regex-replacement-input" placeholder="替换为" style="min-height: 40px; resize: vertical;"></textarea>
     <button id="add-regex-btn">添加规则</button>
 `;
 panelContent.appendChild(regexModule);
@@ -485,10 +486,11 @@ function renderRegexRules() {
     regexRules.forEach((rule, index) => {
         const div = document.createElement('div');
         div.innerHTML = `
-            <span>${rule.pattern} -> ${rule.replacement}</span>
+            <span><strong>${rule.name || '无名'}</strong>: ${rule.pattern} -> ${rule.replacement}</span>
             <button data-index="${index}">删除</button>
         `;
-        div.querySelector('button').addEventListener('click', () => {
+        div.querySelector('button').addEventListener('click', (e) => {
+            e.stopPropagation();
             regexRules.splice(index, 1);
             localStorage.setItem('regexRules', JSON.stringify(regexRules));
             renderRegexRules();
@@ -498,12 +500,14 @@ function renderRegexRules() {
 }
 
 document.getElementById('add-regex-btn').addEventListener('click', () => {
+    const name = document.getElementById('regex-name-input').value.trim();
     const pattern = document.getElementById('regex-pattern-input').value;
     const replacement = document.getElementById('regex-replacement-input').value;
     if (pattern) {
-        regexRules.push({ pattern, replacement });
+        regexRules.push({ name, pattern, replacement });
         localStorage.setItem('regexRules', JSON.stringify(regexRules));
         renderRegexRules();
+        document.getElementById('regex-name-input').value = '';
         document.getElementById('regex-pattern-input').value = '';
         document.getElementById('regex-replacement-input').value = '';
     }
@@ -637,11 +641,24 @@ panelContent.insertBefore(identityModule, genBtn);
 const togglePanelBtn = document.createElement('button');
 togglePanelBtn.textContent = '切换大面板';
 togglePanelBtn.addEventListener('click', () => {
-    panel.classList.toggle('large-mode');
-    if (panel.classList.contains('large-mode')) {
-        togglePanelBtn.textContent = '切换小面板';
-    } else {
-        togglePanelBtn.textContent = '切换大面板';
+    const isLarge = panel.classList.toggle('large-mode');
+    
+    // 切换按钮文本
+    togglePanelBtn.textContent = isLarge ? '切换小面板' : '切换大面板';
+
+    // 切换时隐藏/显示配置模块
+    const configModules = [
+        sliderContainer, apiBtn, apiModule, promptBtn, userPromptModule, 
+        identityModule, regexModule, fixedBtnContainer, debugContainer
+    ];
+    configModules.forEach(module => {
+        module.style.display = isLarge ? 'none' : '';
+    });
+
+    // 如果是从大面板切回小面板，清除行内尺寸样式
+    if (!isLarge) {
+        panel.style.width = '';
+        panel.style.height = '';
     }
 });
 panelContent.insertBefore(togglePanelBtn, panelContent.firstChild);

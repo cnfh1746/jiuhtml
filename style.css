@@ -1,3 +1,14 @@
+:root {
+    --panel-bg: #2a2a2e;
+    --text-color: #f0f0f0;
+    --input-bg: #3a3a3e;
+    --input-border: #555;
+    --button-bg: #4a4a4e;
+    --button-hover-bg: #5a5a5e;
+    --accent-color: #00aaff;
+    --divider-color: #444;
+}
+
 /* ===========================
    按钮样式
    =========================== */
@@ -10,6 +21,8 @@
     border: none;
     cursor: pointer;
     z-index: 9999;
+    color: var(--accent-color);
+    text-shadow: 0 0 5px rgba(0, 170, 255, 0.7);
 }
 
 /* ===========================
@@ -19,17 +32,19 @@
     position: fixed;
     top: 70px;
     right: 20px;
-    width: 350px; /* 适当加宽 */
+    width: 380px;
     max-height: 85vh;
-    background-color: #fdfdfd;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    padding: 15px;
+    background-color: var(--panel-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    padding: 20px;
     overflow-y: auto;
     z-index: 9998;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
+    color: var(--text-color);
+    display: flex;
+    flex-direction: column;
 }
 
 .friend-circle-panel.hidden {
@@ -39,21 +54,23 @@
 /* 通用按钮样式 */
 .friend-circle-panel button {
     cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    background-color: #f0f0f0;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: none;
+    background-color: var(--button-bg);
+    color: var(--text-color);
     transition: background-color 0.2s;
+    font-weight: bold;
 }
 
 .friend-circle-panel button:hover {
-    background-color: #e0e0e0;
+    background-color: var(--button-hover-bg);
 }
 
 .friend-circle-panel button:disabled {
-    background-color: #f5f5f5;
+    background-color: #333;
     cursor: not-allowed;
-    color: #aaa;
+    color: #888;
 }
 
 /* 输入框和选择框样式 */
@@ -61,45 +78,60 @@
 .friend-circle-panel select,
 .friend-circle-panel textarea {
     width: 100%;
-    padding: 8px;
-    margin: 5px 0 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 6px;
+    padding: 10px;
+    margin: 8px 0 12px 0;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
     box-sizing: border-box;
+    background-color: var(--input-bg);
+    color: var(--text-color);
+}
+
+.friend-circle-panel h4 {
+    color: var(--accent-color);
+    border-bottom: 1px solid var(--divider-color);
+    padding-bottom: 5px;
+    margin-top: 15px;
 }
 
 /* ===========================
    模块样式
    =========================== */
-#api-module, #user-prompt-module {
-    border-top: 1px solid #eee;
-    padding-top: 10px;
-    margin-top: 10px;
+#api-module, #user-prompt-module, #regex-module, #identityModule {
+    border-top: 1px solid var(--divider-color);
+    padding-top: 15px;
+    margin-top: 15px;
 }
 
-/* 提示词列表 */
-#prompt-list-container div {
-    padding: 5px;
-    border-bottom: 1px solid #f0f0f0;
+/* 提示词/正则列表 */
+#prompt-list-container div, #regex-list div {
+    padding: 8px;
+    border-bottom: 1px solid var(--divider-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 #prompt-list-container input[type="radio"] {
-    margin-right: 8px;
+    margin-right: 10px;
 }
 
 /* 状态提示文字 */
 #api-status {
     font-size: 14px;
-    margin-top: 8px;
+    margin-top: 10px;
+    color: #00ffaa;
 }
 
 /* 生成结果容器 */
 #friend-circle-output {
-    margin-top: 15px;
-    border-top: 1px solid #eee;
-    padding-top: 10px;
+    margin-top: 20px;
+    border-top: 1px solid var(--divider-color);
+    padding: 15px;
     overflow: auto;
     flex-grow: 1;
+    background-color: var(--input-bg);
+    border-radius: 8px;
 }
 
 /* 大面板模式 */
@@ -111,20 +143,9 @@
     height: 80vh;
     max-height: 90vh;
     resize: both;
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
+    overflow: hidden; /* 父容器overflow hidden，让内部滚动 */
 }
 
-/* 正则替换模块 */
-#regex-module {
-    border-top: 1px solid #eee;
-    padding-top: 10px;
-    margin-top: 10px;
-}
-
-#regex-list div {
-    display: flex;
-    justify-content: space-between;
-    padding: 2px 0;
+.friend-circle-panel.large-mode #friend-circle-output {
+    height: 100%; /* 占满大面板 */
 }
