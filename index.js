@@ -525,19 +525,7 @@ async function generateFriendCircle(selectedChat, selectedWorldbooks) {
         }
 
         let outputContainer = document.getElementById('friend-circle-output');
-        outputContainer.innerHTML = '';
-
-        output.split('\n').forEach(text => {
-            if (!text.trim()) return;
-            const p = document.createElement('div');
-            p.textContent = text;
-            p.style.cursor = 'pointer';
-            p.style.padding = '2px 4px';
-            p.style.borderBottom = '1px solid #eee';
-            p.title = '点击复制';
-            p.addEventListener('click', () => navigator.clipboard.writeText(text));
-            outputContainer.appendChild(p);
-        });
+        outputContainer.innerHTML = output; // 直接渲染HTML
 
     } catch (e) {
         console.error('生成朋友圈失败:', e);
@@ -545,14 +533,14 @@ async function generateFriendCircle(selectedChat, selectedWorldbooks) {
         debugLog('生成朋友圈失败', e.message);
     } finally {
         genBtn.disabled = false;
-        genBtn.textContent = '生成朋友圈';
+        genBtn.textContent = '生成';
     }
 }
 
 // ----------------- 生成按钮 -----------------
 const genBtn = document.createElement('button');
 genBtn.id = 'gen-btn';
-genBtn.textContent = '生成朋友圈';
+genBtn.textContent = '生成';
 genBtn.style.marginTop = '10px';
 genBtn.style.width = '100%';
 panelContent.appendChild(genBtn);
