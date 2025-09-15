@@ -32,9 +32,8 @@
     position: fixed;
     top: 70px;
     right: 20px;
-    width: 380px;
+    width: 400px; /* 统一宽度 */
     height: 85vh;
-    max-height: 85vh;
     background-color: var(--panel-bg);
     border: 1px solid var(--input-border);
     border-radius: 12px;
@@ -44,28 +43,14 @@
     color: var(--text-color);
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* 父容器隐藏溢出 */
+    overflow: hidden; /* 隐藏滚动条，由内部处理 */
 }
 
 #panel-content {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    flex-grow: 1;
+    overflow-y: auto; /* 主要内容区域滚动 */
     padding: 20px;
-}
-
-#controls-wrapper {
-    overflow-y: auto; /* 控件区域独立滚动 */
-    padding-right: 10px; /* 留出滚动条空间 */
-    flex-shrink: 0;
-}
-
-#output-wrapper {
-    flex-grow: 1; /* 占据剩余空间 */
-    overflow-y: auto;
-    margin-top: 15px;
-    border-top: 1px solid var(--divider-color);
-    padding-top: 15px;
+    padding-bottom: 70px; /* 为固定按钮栏留出空间 */
 }
 
 .friend-circle-panel.hidden {
@@ -134,6 +119,16 @@
     word-break: break-all;
 }
 
+.delete-btn {
+    background: #c0392b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 2px 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
 #prompt-list-container input[type="radio"] {
     margin-right: 10px;
 }
@@ -150,7 +145,8 @@
     background-color: var(--input-bg);
     border-radius: 8px;
     padding: 15px;
-    height: 100%;
+    margin-top: 15px;
+    min-height: 100px; /* 保证有最小高度 */
 }
 
 /* 大面板模式 */
@@ -161,22 +157,38 @@
     width: 80vw;
     height: 80vh;
     resize: both;
+    overflow: auto; /* 允许整个大面板调整大小时出现滚动条 */
 }
 
-.friend-circle-panel.large-mode #controls-wrapper {
-    flex-basis: 300px; /* 固定控件区域高度 */
-    flex-shrink: 0;
+/* 固定按钮容器 */
+#fixed-btn-container {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background-color: var(--panel-bg);
+    border-top: 1px solid var(--divider-color);
 }
 
 /* 调试日志区域 */
 #friend-circle-debug {
-    background-color: var(--input-bg);
+    background-color: #1e1e1e;
     border: 1px solid var(--divider-color);
-    color: #ccc;
+    color: #d4d4d4;
     padding: 10px;
     border-radius: 8px;
-    max-height: 120px;
+    max-height: 150px;
     overflow-y: auto;
     white-space: pre-wrap;
-    margin-top: 10px;
+    margin-top: 15px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#slider-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
 }
