@@ -149,3 +149,12 @@
 .friend-circle-panel.large-mode #friend-circle-output {
     height: 100%; /* 占满大面板 */
 }
+
+/* 调试日志区域 */
+#friend-circle-debug {
+    background-color: var(--input-bg);
+    border: 1px solid var(--divider-color);
+    color: #ccc;
+    padding: 10px;
+    border-radius: 8px;
+}
