@@ -6,118 +6,81 @@ import { extension_settings, getContext, loadExtensionSettings } from "../../../
 //You'll likely need to import some other functions from the main script
 import { saveSettingsDebounced } from "../../../../script.js";
 
-// ----------------- 初始化按钮与面板 -----------------  
-const starBtn = document.createElement('button');  
-starBtn.id = 'friend-circle-btn';  
-starBtn.textContent = '🌟';  
-Object.assign(starBtn.style, {  
-    position: 'fixed',  
-    right: '12px',  
-    top: '300px',  
-    transform: 'translateY(-50%)',  
-    fontSize: '22px',  
-    background: 'transparent',  
-    border: 'none',  
-    cursor: 'pointer',  
-    zIndex: 9999  
-});  
-document.body.appendChild(starBtn);  
-  
-const panel = document.createElement('div');  
-panel.id = 'friend-circle-panel';  
-Object.assign(panel.style, {  
-    position: 'fixed',  
-    right: '60px',  
-    top: '300px',  
-    transform: 'translateY(-50%)',  
-    width: '300px',  
-    maxHeight: '400px',  
-    overflowY: 'auto',  
-    background: '#fff',  
-    border: '1px solid #ccc',  
-    borderRadius: '6px',  
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',  
-    padding: '8px',  
-    display: 'none',  
-    zIndex: 9999,
-    color: 'black'   
-});  
-document.body.appendChild(panel);  
-  
-// 面板内容容器  
-const panelContent = document.createElement('div');  
-panelContent.id = 'panel-content';  
-panel.appendChild(panelContent);  
-  
-// ----------------- 调试日志区域 -----------------  
-const debugContainer = document.createElement('div');  
-debugContainer.id = 'friend-circle-debug';  
-Object.assign(debugContainer.style, {  
-    marginTop: '10px',  
-    padding: '6px',  
-    background: '#f9f9f9',  
-    fontSize: '12px',  
-    maxHeight: '120px',  
-    overflowY: 'auto',  
-    border: '1px solid #ddd',  
-    whiteSpace: 'pre-wrap'  
-});  
-panelContent.appendChild(debugContainer);  
-  
-function debugLog(step, data) {  
-    const msg = `[朋友圈调试] ${step} ${data ? JSON.stringify(data, null, 2) : ''}`;  
-    console.log(msg);  
-    const line = document.createElement('div');  
-    line.textContent = msg;  
-    debugContainer.appendChild(line);  
-    debugContainer.scrollTop = debugContainer.scrollHeight;  
-}  
-  
-// ----------------- ⚙️ API 模块 -----------------  
-const apiBtn = document.createElement('button');  
-apiBtn.textContent = '⚙️';  
-Object.assign(apiBtn.style, {  
-    position: 'absolute',  
-    top: '6px',  
-    right: '6px',  
-    cursor: 'pointer',  
-    background: 'transparent',  
-    border: 'none',  
-    fontSize: '16px'  
-});  
-panelContent.appendChild(apiBtn);  
-  
-const apiModule = document.createElement('div');  
-apiModule.id = 'api-module';  
-Object.assign(apiModule.style, {  
-    marginTop: '28px',  
-    display: 'none'  
-});  
-panelContent.appendChild(apiModule);  
-  
-apiBtn.addEventListener('click', async () => {  
-    apiModule.style.display = apiModule.style.display === 'none' ? 'block' : 'none';  
-    debugLog('切换API设置面板', apiModule.style.display);  
-    // 当面板第一次打开时，尝试自动拉取模型（如果未曾拉取过）
-    if (apiModule.style.display === 'block') {  
-        try {  
-            await fetchAndPopulateModels(false); // 不强制，第一次会拉取一次并记录时间  
-        } catch (e) {  
-            // fetch 内部已经有 debugLog，这里仅捕获防止未处理的 promise  
-        }  
-    }  
-});  
-  
-// API模块表单（包含刷新模型按钮）  
-apiModule.innerHTML = `  
-    <label>API URL: <input type="text" id="api-url-input"></label><br>  
-    <label>API Key: <input type="text" id="api-key-input"></label><br>  
-    <label>模型: <select id="api-model-select"></select></label><br>  
-    <button id="api-save-btn">保存配置</button>  
-    <button id="api-test-btn">测试连接</button>  
-    <button id="api-refresh-models-btn">刷新模型</button>  
-    <div id="api-status" style="margin-top:4px;color:green;"></div>  
-`;  
+// ----------------- 初始化按钮与面板 -----------------
+const starBtn = document.createElement('button');
+starBtn.id = 'friend-circle-btn';
+starBtn.textContent = '🌟';
+document.body.appendChild(starBtn);
+
+const panel = document.createElement('div');
+panel.id = 'friend-circle-panel';
+panel.className = 'friend-circle-panel hidden'; // 使用 class 控制显隐
+document.body.appendChild(panel);
+
+// 面板内容容器
+const panelContent = document.createElement('div');
+panelContent.id = 'panel-content';
+panel.appendChild(panelContent);
+
+// ----------------- 调试日志区域 -----------------
+const debugContainer = document.createElement('div');
+debugContainer.id = 'friend-circle-debug';
+Object.assign(debugContainer.style, {
+    marginTop: '10px',
+    padding: '6px',
+    background: '#f9f9f9',
+    fontSize: '12px',
+    maxHeight: '120px',
+    overflowY: 'auto',
+    border: '1px solid #ddd',
+    whiteSpace: 'pre-wrap'
+});
+panelContent.appendChild(debugContainer);
+
+function debugLog(step, data) {
+    const msg = `[朋友圈调试] ${step} ${data ? JSON.stringify(data, null, 2) : ''}`;
+    console.log(msg);
+    const line = document.createElement('div');
+    line.textContent = msg;
+    debugContainer.appendChild(line);
+    debugContainer.scrollTop = debugContainer.scrollHeight;
+}
+
+// ----------------- ⚙️ API 模块 -----------------
+const apiBtn = document.createElement('button');
+apiBtn.textContent = '⚙️ API设置';
+apiBtn.style.width = '100%';
+panelContent.appendChild(apiBtn);
+
+const apiModule = document.createElement('div');
+apiModule.id = 'api-module';
+apiModule.style.display = 'none'; // 默认隐藏
+panelContent.appendChild(apiModule);
+
+apiBtn.addEventListener('click', async () => {
+    const isHidden = apiModule.style.display === 'none';
+    apiModule.style.display = isHidden ? 'block' : 'none';
+    userPromptModule.style.display = 'none'; // 点击API时隐藏提示词模块
+    debugLog('切换API设置面板', apiModule.style.display);
+    if (isHidden) {
+        try {
+            await fetchAndPopulateModels(false);
+        } catch (e) {
+            // 忽略错误
+        }
+    }
+});
+
+// API模块表单
+apiModule.innerHTML = `
+    <label>API URL: <input type="text" id="api-url-input"></label><br>
+    <label>API Key: <input type="text" id="api-key-input"></label><br>
+    <label>模型: <select id="api-model-select"></select></label>
+    <button id="api-refresh-models-btn" style="margin-left: 5px;">刷新</button><br>
+    <button id="api-save-btn">保存配置</button>
+    <button id="api-test-btn">测试连接</button>
+    <div id="api-status" style="margin-top:4px;color:green;"></div>
+`;
   
 // 载入已有配置  
 document.getElementById('api-url-input').value = localStorage.getItem('independentApiUrl') || '';  
@@ -313,126 +276,132 @@ async function fetchAndPopulateModels(force = false) {
     }  
 }  
   
-// ----------------- 🌟 按钮逻辑 -----------------  
-starBtn.addEventListener('click', () => {  
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';  
-    debugLog('切换朋友圈面板', panel.style.display);  
-});  
+// ----------------- 🌟 按钮逻辑 -----------------
+starBtn.addEventListener('click', () => {
+    panel.classList.toggle('hidden');
+    debugLog('切换朋友圈面板', panel.className);
+});
+
 // ----------------- 用户自定义提示词模块 -----------------
-const promptBtn = document.createElement('button');  
-promptBtn.textContent = '🖊️';  
-Object.assign(promptBtn.style, {  
-    position: 'absolute',  
-    top: '6px',  
-    left: '6px',  
-    cursor: 'pointer',  
-    background: 'transparent',  
-    border: 'none',  
-    fontSize: '16px'  
-});  
-panelContent.appendChild(promptBtn);  
+const promptBtn = document.createElement('button');
+promptBtn.textContent = '🖊️ 提示词管理';
+promptBtn.style.width = '100%';
+promptBtn.style.marginTop = '10px';
+panelContent.appendChild(promptBtn);
 
-const userPromptModule = document.createElement('div');  
-userPromptModule.id = 'user-prompt-module';  
-Object.assign(userPromptModule.style, {  
-    marginTop: '28px',  
-    display: 'none',  
-    maxHeight: '200px',  
-    overflowY: 'auto',  
-    borderTop: '1px solid #ccc',  
-    paddingTop: '6px'  
-});  
-panelContent.appendChild(userPromptModule);  
+const userPromptModule = document.createElement('div');
+userPromptModule.id = 'user-prompt-module';
+userPromptModule.style.display = 'none'; // 默认隐藏
+panelContent.appendChild(userPromptModule);
 
-userPromptModule.innerHTML = `  
-    <div style="margin-bottom:4px;">  
-        <input type="text" id="new-prompt-input" placeholder="输入自定义提示词" style="width:70%">  
-        <button id="add-prompt-btn">添加</button>  
-    </div>  
-    <div id="prompt-list-container" style="max-height:140px; overflow-y:auto;"></div>  
-    <button id="save-prompts-btn" style="margin-top:4px;">保存提示词</button>  
+userPromptModule.innerHTML = `
+    <div style="margin-bottom:4px;">
+        <textarea id="new-prompt-input" placeholder="输入自定义提示词" style="width:100%; min-height: 40px; resize: vertical;"></textarea>
+        <button id="add-prompt-btn">添加</button>
+    </div>
+    <div id="prompt-list-container" style="max-height:140px; overflow-y:auto;"></div>
 `;
 
-promptBtn.addEventListener('click', () => {  
-    userPromptModule.style.display = userPromptModule.style.display === 'none' ? 'block' : 'none';  
-    debugLog('切换用户自定义提示词模块', userPromptModule.style.display);  
-});  
+promptBtn.addEventListener('click', () => {
+    const isHidden = userPromptModule.style.display === 'none';
+    userPromptModule.style.display = isHidden ? 'block' : 'none';
+    apiModule.style.display = 'none'; // 点击提示词时隐藏API模块
+    debugLog('切换用户自定义提示词模块', userPromptModule.style.display);
+});
 
-const PROMPTS_KEY = 'friendCircleUserPrompts';  
-
-// 全局内存数组，保持最新状态
+const PROMPTS_KEY = 'friendCircleUserPrompts';
 let friendCirclePrompts = [];
+let selectedPromptIndex = -1;
 
 // 从 localStorage 读取
-function loadUserPrompts() {  
-    const raw = localStorage.getItem(PROMPTS_KEY);  
-    friendCirclePrompts = raw ? JSON.parse(raw) : [];  
-    return friendCirclePrompts;  
-}  
+function loadUserPrompts() {
+    const raw = localStorage.getItem(PROMPTS_KEY);
+    friendCirclePrompts = raw ? JSON.parse(raw) : [];
+    selectedPromptIndex = friendCirclePrompts.findIndex(p => p.selected);
+    if (selectedPromptIndex === -1 && friendCirclePrompts.length > 0) {
+        selectedPromptIndex = 0;
+        friendCirclePrompts[0].selected = true;
+    }
+    return friendCirclePrompts;
+}
 
 // 渲染提示词列表
-function renderPromptList() {  
-    const container = document.getElementById('prompt-list-container');  
-    container.innerHTML = '';  
-    friendCirclePrompts.forEach((p, idx) => {  
-        const div = document.createElement('div');  
-        div.style.display = 'flex';  
-        div.style.alignItems = 'center';  
-        div.style.marginBottom = '2px';  
+function renderPromptList() {
+    const container = document.getElementById('prompt-list-container');
+    container.innerHTML = '';
+    friendCirclePrompts.forEach((p, idx) => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.alignItems = 'center';
+        div.style.marginBottom = '2px';
 
-        const checkbox = document.createElement('input');  
-        checkbox.type = 'checkbox';  
-        checkbox.checked = p.enabled || false;  
-        checkbox.style.marginRight = '4px';  
-        checkbox.addEventListener('change', () => {  
-            friendCirclePrompts[idx].enabled = checkbox.checked;  
-            localStorage.setItem(PROMPTS_KEY, JSON.stringify(friendCirclePrompts));  
-        });  
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'prompt-selection';
+        radio.checked = idx === selectedPromptIndex;
+        radio.style.marginRight = '4px';
+        radio.addEventListener('change', () => {
+            selectedPromptIndex = idx;
+            friendCirclePrompts.forEach((prompt, i) => prompt.selected = (i === idx));
+            localStorage.setItem(PROMPTS_KEY, JSON.stringify(friendCirclePrompts));
+        });
 
-        const span = document.createElement('span');  
-        span.textContent = p.text;  
-        span.style.flex = '1';  
-        span.style.overflow = 'hidden';  
-        span.style.textOverflow = 'ellipsis';  
-        span.style.whiteSpace = 'nowrap';  
+        const span = document.createElement('span');
+        span.textContent = p.text;
+        span.style.flex = '1';
+        span.style.overflow = 'hidden';
+        span.style.textOverflow = 'ellipsis';
+        span.style.whiteSpace = 'nowrap';
 
-        const delBtn = document.createElement('button');  
-        delBtn.textContent = '❌';  
-        delBtn.style.marginLeft = '4px';  
-        delBtn.addEventListener('click', () => {  
-            friendCirclePrompts.splice(idx, 1);  
-            localStorage.setItem(PROMPTS_KEY, JSON.stringify(friendCirclePrompts));  
-            renderPromptList();  
-        });  
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '❌';
+        delBtn.style.marginLeft = '4px';
+        delBtn.addEventListener('click', () => {
+            friendCirclePrompts.splice(idx, 1);
+            if (idx === selectedPromptIndex) {
+                selectedPromptIndex = friendCirclePrompts.length > 0 ? 0 : -1;
+                if (selectedPromptIndex !== -1) friendCirclePrompts[0].selected = true;
+            }
+            localStorage.setItem(PROMPTS_KEY, JSON.stringify(friendCirclePrompts));
+            renderPromptList();
+        });
 
-        div.appendChild(checkbox);  
-        div.appendChild(span);  
-        div.appendChild(delBtn);  
-        container.appendChild(div);  
-    });  
-}  
+        div.appendChild(radio);
+        div.appendChild(span);
+        div.appendChild(delBtn);
+        container.appendChild(div);
+    });
+}
 
 // 新增提示词
-document.getElementById('add-prompt-btn').addEventListener('click', () => {  
-    const input = document.getElementById('new-prompt-input');  
-    const val = input.value.trim();  
-    if (!val) return alert('请输入提示词');  
-    friendCirclePrompts.push({ text: val, enabled: true });  
-    localStorage.setItem(PROMPTS_KEY, JSON.stringify(friendCirclePrompts));  
-    input.value = '';  
-    renderPromptList();  
-});  
+document.getElementById('add-prompt-btn').addEventListener('click', () => {
+    const input = document.getElementById('new-prompt-input');
+    const val = input.value.trim();
+    if (!val) return alert('请输入提示词');
+    friendCirclePrompts.push({ text: val, selected: false });
+    if (selectedPromptIndex === -1) {
+        selectedPromptIndex = 0;
+        friendCirclePrompts[0].selected = true;
+    }
+    localStorage.setItem(PROMPTS_KEY, JSON.stringify(friendCirclePrompts));
+    input.value = '';
+    input.style.height = 'auto';
+    renderPromptList();
+});
 
-// 保存提示词
-document.getElementById('save-prompts-btn').addEventListener('click', () => {  
-    localStorage.setItem(PROMPTS_KEY, JSON.stringify(friendCirclePrompts));  
-    alert('提示词已保存');  
-    debugLog('保存用户自定义提示词', friendCirclePrompts);  
-});  
+// 提示词输入框高度自适应
+const newPromptInput = document.getElementById('new-prompt-input');
+newPromptInput.addEventListener('input', () => {
+    newPromptInput.style.height = 'auto';
+    newPromptInput.style.height = (newPromptInput.scrollHeight) + 'px';
+});
 
-// 获取启用的提示词（朋友圈生成模块调用）
-function getEnabledPrompts() {
-    return friendCirclePrompts.filter(p => p.enabled).map(p => p.text);
+// 获取选中的提示词
+function getSelectedPrompt() {
+    if (selectedPromptIndex > -1 && friendCirclePrompts[selectedPromptIndex]) {
+        return friendCirclePrompts[selectedPromptIndex].text;
+    }
+    return null;
 }
 
 // 初始化
@@ -496,7 +465,7 @@ async function getLastTenMessages() {
 }
   
 // ----------------- 朋友圈生成 -----------------
-async function generateFriendCircle(selectedChat, selectedWorldbooks, count = 3) {
+async function generateFriendCircle(selectedChat, selectedWorldbooks) {
     const url = localStorage.getItem('independentApiUrl');
     const key = localStorage.getItem('independentApiKey');
     const model = localStorage.getItem('independentApiModel');
@@ -507,26 +476,24 @@ async function generateFriendCircle(selectedChat, selectedWorldbooks, count = 3)
         return;
     }
 
+    const genBtn = document.getElementById('gen-btn');
+    genBtn.disabled = true;
+    genBtn.textContent = '生成中...';
+
     // ========== 构造 Prompt ==========
     let prompt = "";
-
-    // 1. 提示词（高优先级）
-    const enabledPrompts = loadUserPrompts().filter(p => p.enabled).map(p => p.text);
-    if (enabledPrompts.length > 0) {
-        prompt += `【生成指导提示词 - 高优先级】\n${enabledPrompts.join('\n')}\n\n`;
+    const selectedPrompt = getSelectedPrompt();
+    if (selectedPrompt) {
+        prompt += `【生成指导提示词 - 高优先级】\n${selectedPrompt}\n\n`;
     }
 
-    // 2. 聊天记录（低优先级参考）
     if (selectedChat && selectedChat.length > 0) {
         prompt += `【参考聊天记录 - 禁止复写】\n${selectedChat.join('\n')}\n\n`;
     }
 
-    // 3. 世界书（低优先级参考）
     if (selectedWorldbooks && selectedWorldbooks.length > 0) {
         prompt += `【参考世界书 - 低优先级】\n${selectedWorldbooks.join('\n')}\n\n`;
     }
-
-   
 
     try {
         debugLog('发送API请求', { url, model });
@@ -557,14 +524,7 @@ async function generateFriendCircle(selectedChat, selectedWorldbooks, count = 3)
             output = data.choices.map(c => c.message?.content || '').join('\n');
         }
 
-        // ========== 输出到面板 ==========
         let outputContainer = document.getElementById('friend-circle-output');
-        if (!outputContainer) {
-            outputContainer = document.createElement('div');
-            outputContainer.id = 'friend-circle-output';
-            outputContainer.style.marginTop = '8px';
-            panelContent.appendChild(outputContainer);
-        }
         outputContainer.innerHTML = '';
 
         output.split('\n').forEach(text => {
@@ -579,33 +539,30 @@ async function generateFriendCircle(selectedChat, selectedWorldbooks, count = 3)
             outputContainer.appendChild(p);
         });
 
-        // ========== 输出到调试区 ==========
-        output.split('\n').forEach((text, i) => {
-            if (!text.trim()) return;
-            const line = document.createElement('div');
-            line.textContent = `第${i + 1}条: ${text}`;
-            debugContainer.appendChild(line);
-        });
-        debugContainer.scrollTop = debugContainer.scrollHeight;
     } catch (e) {
         console.error('生成朋友圈失败:', e);
         alert('生成失败: ' + e.message);
         debugLog('生成朋友圈失败', e.message);
+    } finally {
+        genBtn.disabled = false;
+        genBtn.textContent = '生成朋友圈';
     }
 }
-  
-// ----------------- 测试按钮 -----------------  
-const genBtn = document.createElement('button');  
-genBtn.textContent = '生成朋友圈';  
-genBtn.style.marginTop = '6px';  
-panelContent.appendChild(genBtn);  
-  
-genBtn.addEventListener('click', async () => {  
-    debugLog('点击生成朋友圈按钮');  
-    const lastMessages = await getLastTenMessages();  
-    const selectedChat = lastMessages ? lastMessages.map(m => m.text) : ['昨天和小明聊天很开心', '今天完成了一个大项目'];  
-    const selectedWorldbooks = ['', ''];  
-    generateFriendCircle(selectedChat, selectedWorldbooks);  
+
+// ----------------- 生成按钮 -----------------
+const genBtn = document.createElement('button');
+genBtn.id = 'gen-btn';
+genBtn.textContent = '生成朋友圈';
+genBtn.style.marginTop = '10px';
+genBtn.style.width = '100%';
+panelContent.appendChild(genBtn);
+
+genBtn.addEventListener('click', async () => {
+    debugLog('点击生成朋友圈按钮');
+    const lastMessages = await getLastTenMessages();
+    const selectedChat = lastMessages ? lastMessages.map(m => m.text) : [];
+    const selectedWorldbooks = []; // 暂时为空
+    generateFriendCircle(selectedChat, selectedWorldbooks);
 });
 let outputContainer = document.getElementById('friend-circle-output');
 if (!outputContainer) {

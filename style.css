@@ -3,8 +3,8 @@
    =========================== */
 #friend-circle-btn {
     position: fixed;
-    top: 20px;            /* 改成距离顶部 */
-    right: 20px;          /* 右侧固定 */
+    top: 20px;
+    right: 20px;
     font-size: 22px;
     background: transparent;
     border: none;
@@ -17,71 +17,85 @@
    =========================== */
 .friend-circle-panel {
     position: fixed;
-    top: 70px;            /* 面板从顶部偏移 */
-    right: 20px;          /* 靠右显示 */
-    width: 320px;
-    max-height: 80vh;     /* 不会超出屏幕高度 */
-    background-color: #fff;
+    top: 70px;
+    right: 20px;
+    width: 350px; /* 适当加宽 */
+    max-height: 85vh;
+    background-color: #fdfdfd;
     border: 1px solid #ccc;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    padding: 12px;
-    overflow-y: auto;      /* 超出内容可滚动 */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    padding: 15px;
+    overflow-y: auto;
     z-index: 9998;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
 }
 
-/* 隐藏面板 */
 .friend-circle-panel.hidden {
     display: none;
 }
 
-/* 面板标题和按钮布局 */
-.friend-circle-panel h3,
-.friend-circle-panel h4 {
-    margin: 0 0 8px 0;
-}
-
+/* 通用按钮样式 */
 .friend-circle-panel button {
     cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background-color: #f0f0f0;
+    transition: background-color 0.2s;
+}
+
+.friend-circle-panel button:hover {
+    background-color: #e0e0e0;
+}
+
+.friend-circle-panel button:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+    color: #aaa;
 }
 
 /* 输入框和选择框样式 */
 .friend-circle-panel input[type="text"],
-.friend-circle-panel select {
+.friend-circle-panel select,
+.friend-circle-panel textarea {
     width: 100%;
-    padding: 6px 8px;
-    margin: 4px 0 8px 0;
+    padding: 8px;
+    margin: 5px 0 10px 0;
     border: 1px solid #ccc;
-    border-radius: 4px;
+    border-radius: 6px;
     box-sizing: border-box;
 }
 
-/* 模型刷新按钮 */
-#refresh-models {
-    font-size: 12px;
-    padding: 2px 6px;
-    margin-left: 4px;
+/* ===========================
+   模块样式
+   =========================== */
+#api-module, #user-prompt-module {
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+/* 提示词列表 */
+#prompt-list-container div {
+    padding: 5px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+#prompt-list-container input[type="radio"] {
+    margin-right: 8px;
 }
 
 /* 状态提示文字 */
 #api-status {
     font-size: 14px;
+    margin-top: 8px;
 }
 
-/* API面板与朋友圈内容切换 */
-#friend-circle-content,
-#api-panel {
-    transition: all 0.2s ease;
-}
-
-/* 关闭按钮 */
-#friend-circle-close {
-    width: 100%;
-    margin-top: 12px;
-    padding: 6px 0;
-    background-color: #eee;
-    border: 1px solid #ccc;
+/* 生成结果容器 */
+#friend-circle-output {
+    margin-top: 15px;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
 }
