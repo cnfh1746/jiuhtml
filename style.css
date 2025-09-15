@@ -33,18 +33,39 @@
     top: 70px;
     right: 20px;
     width: 380px;
+    height: 85vh;
     max-height: 85vh;
     background-color: var(--panel-bg);
     border: 1px solid var(--input-border);
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-    padding: 20px;
-    overflow-y: auto;
     z-index: 9998;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-color);
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* 父容器隐藏溢出 */
+}
+
+#panel-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 20px;
+}
+
+#controls-wrapper {
+    overflow-y: auto; /* 控件区域独立滚动 */
+    padding-right: 10px; /* 留出滚动条空间 */
+    flex-shrink: 0;
+}
+
+#output-wrapper {
+    flex-grow: 1; /* 占据剩余空间 */
+    overflow-y: auto;
+    margin-top: 15px;
+    border-top: 1px solid var(--divider-color);
+    padding-top: 15px;
 }
 
 .friend-circle-panel.hidden {
@@ -110,6 +131,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    word-break: break-all;
 }
 
 #prompt-list-container input[type="radio"] {
@@ -125,13 +147,10 @@
 
 /* 生成结果容器 */
 #friend-circle-output {
-    margin-top: 20px;
-    border-top: 1px solid var(--divider-color);
-    padding: 15px;
-    overflow: auto;
-    flex-grow: 1;
     background-color: var(--input-bg);
     border-radius: 8px;
+    padding: 15px;
+    height: 100%;
 }
 
 /* 大面板模式 */
@@ -141,13 +160,12 @@
     transform: translate(-50%, -50%);
     width: 80vw;
     height: 80vh;
-    max-height: 90vh;
     resize: both;
-    overflow: hidden; /* 父容器overflow hidden，让内部滚动 */
 }
 
-.friend-circle-panel.large-mode #friend-circle-output {
-    height: 100%; /* 占满大面板 */
+.friend-circle-panel.large-mode #controls-wrapper {
+    flex-basis: 300px; /* 固定控件区域高度 */
+    flex-shrink: 0;
 }
 
 /* 调试日志区域 */
@@ -157,4 +175,8 @@
     color: #ccc;
     padding: 10px;
     border-radius: 8px;
+    max-height: 120px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    margin-top: 10px;
 }
