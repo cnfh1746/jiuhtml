@@ -180,8 +180,7 @@
     padding: 15px;
     margin-top: 15px;
     min-height: 150px;
-    white-space: pre-wrap;
-    word-break: break-word;
+    word-break: break-word; /* Remove white-space: pre-wrap */
 }
 
 /* 大面板模式 */
@@ -214,4 +213,17 @@
     display: flex;
     align-items: center;
     margin: 15px 0;
+}
+
+#generation-control-container {
+    display: flex;
+    gap: 10px;
+}
+
+#stop-btn {
+    background-color: #c0392b; /* Red color for stop button */
+}
+
+#stop-btn:hover {
+    background-color: #e74c3c;
 }

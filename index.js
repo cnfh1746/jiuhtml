@@ -125,11 +125,22 @@ const outputContainer = document.createElement('div');
 outputContainer.id = 'friend-circle-output';
 panelContent.appendChild(outputContainer);
 
-// 生成按钮
+// 生成与停止按钮容器
+const generationControlContainer = document.createElement('div');
+generationControlContainer.id = 'generation-control-container';
+panelContent.appendChild(generationControlContainer);
+
 const genBtn = document.createElement('button');
 genBtn.id = 'gen-btn';
 genBtn.textContent = '生成';
-panelContent.appendChild(genBtn);
+generationControlContainer.appendChild(genBtn);
+
+const stopBtn = document.createElement('button');
+stopBtn.id = 'stop-btn';
+stopBtn.textContent = '停止';
+stopBtn.style.display = 'none'; // 默认隐藏
+generationControlContainer.appendChild(stopBtn);
+
 
 // 固定注入按钮容器
 const fixedBtnContainer = document.createElement('div');
@@ -407,6 +418,8 @@ function applyRegex(text) {
 }
 
 // --- 生成逻辑 (流式) ---
+let abortController = null;
+
 async function generateFriendCircle() {
     const url = localStorage.getItem('independentApiUrl');
     const key = localStorage.getItem('independentApiKey');
@@ -415,9 +428,13 @@ async function generateFriendCircle() {
         alert('请先配置独立 API 并保存');
         return;
     }
-    genBtn.disabled = true;
-    genBtn.textContent = '生成中...';
+
+    genBtn.style.display = 'none';
+    stopBtn.style.display = 'block';
     outputContainer.innerHTML = '';
+
+    abortController = new AbortController();
+    const signal = abortController.signal;
 
     const systemPrompt = aiIdentityInput.value || "你是HTML生成器。";
     let userPrompt = "";
@@ -436,7 +453,8 @@ async function generateFriendCircle() {
                 model: model,
                 messages: [{ role: "system", content: systemPrompt }, { role: "user", content: userPrompt }],
                 stream: true,
-            })
+            }),
+            signal,
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const reader = res.body.getReader();
@@ -466,14 +484,23 @@ async function generateFriendCircle() {
         }
         outputContainer.innerHTML = applyRegex(fullResponse);
     } catch (e) {
-        outputContainer.textContent = '生成失败: ' + e.message;
+        if (e.name === 'AbortError') {
+            outputContainer.innerHTML += '<br><small style="color: orange;">生成已由用户停止。</small>';
+        } else {
+            outputContainer.textContent = '生成失败: ' + e.message;
+        }
     } finally {
-        genBtn.disabled = false;
-        genBtn.textContent = '生成';
+        genBtn.style.display = 'block';
+        stopBtn.style.display = 'none';
     }
 }
 
 genBtn.addEventListener('click', generateFriendCircle);
+stopBtn.addEventListener('click', () => {
+    if (abortController) {
+        abortController.abort();
+    }
+});
 
 // --- 其他逻辑 ---
 async function getLastTenMessages() {
