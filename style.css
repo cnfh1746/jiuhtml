@@ -98,4 +98,33 @@
     margin-top: 15px;
     border-top: 1px solid #eee;
     padding-top: 10px;
+    overflow: auto;
+    flex-grow: 1;
+}
+
+/* 大面板模式 */
+.friend-circle-panel.large-mode {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80vw;
+    height: 80vh;
+    max-height: 90vh;
+    resize: both;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 正则替换模块 */
+#regex-module {
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+#regex-list div {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
 }
